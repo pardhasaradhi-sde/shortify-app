@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: Url_Shortener
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/url_shortener
+    username: postgres
+    password: pardhasaradhi
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format-sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    clean-disabled: true # IMPORTANT (prevent accidental DB wipe)
+
+  # Redis Configuration
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+# Cache Settings
+cache:
+  url:
+    ttl: 86400 # 24 hours in seconds
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production-minimum-32-characters-required}
+  expiration: 86400000
