@@ -1,6 +1,5 @@
 package com.example.url_shortener.controller;
 
-
 import com.example.url_shortener.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,8 @@ public class RedirectController {
 
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Void> redirect(@PathVariable String shortUrl) {
-        String originalUrl=urlService.resolveShortUrl(shortUrl);
-        return ResponseEntity.status(HttpStatus.FOUND).
-                location(URI.create(originalUrl))
+        String originalUrl = urlService.resolveShortUrl(shortUrl);
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl))
                 .build();
     }
 }

@@ -41,3 +41,15 @@ cache:
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production-minimum-32-characters-required}
   expiration: 86400000
+
+# Rate Limiting Configuration
+rate-limit:
+  url-creation:
+    max-requests: 10 # Maximum URLs a user can create
+    window-seconds: 3600 # Per hour
+  redirect:
+    max-requests: 100 # Maximum redirects per IP
+    window-seconds: 60 # Per minute
+  api:
+    max-requests: 1000 # Maximum API calls per user
+    window-seconds: 3600 # Per hour

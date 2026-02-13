@@ -37,6 +37,25 @@ async function apiRequest(endpoint, options = {}) {
     throw new Error('Unauthorized');
   }
 
+  // Handle 429 Rate Limit Exceeded
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After');
+    const resetHeader = response.headers.get('X-RateLimit-Reset');
+    
+    // Parse response body to get limit info
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+    
+    const limit = data.limit || response.headers.get('X-RateLimit-Limit') || 'your';
+    const retrySeconds = data.retryAfter || retryAfter || 60;
+    const minutes = Math.ceil(retrySeconds / 60);
+    
+    throw new Error(
+      `Rate limit exceeded. You've hit the limit of ${limit} requests. ` +
+      `Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`
+    );
+  }
+
   // Handle 204 No Content
   if (response.status === 204) {
     return null;
