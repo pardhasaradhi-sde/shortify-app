@@ -2,6 +2,7 @@ package com.example.url_shortener.service;
 
 import com.example.url_shortener.dtos.ShortUrlDTORequest;
 import com.example.url_shortener.dtos.ShortUrlDTOResponse;
+import com.example.url_shortener.exception.AliasAlreadyTakenException;
 import com.example.url_shortener.exception.ShortUrlNotFoundException;
 import com.example.url_shortener.model.ShortUrl;
 import com.example.url_shortener.model.User;
@@ -9,15 +10,19 @@ import com.example.url_shortener.repository.ShortUrlRepository;
 import com.example.url_shortener.repository.UserRepository;
 import com.example.url_shortener.utils.UrlUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UrlService {
     private final ShortUrlRepository shortUrlRepository;
     private final UserRepository userRepository;
@@ -53,41 +58,76 @@ public class UrlService {
 
     /**
      * Create short URL for authenticated user.
+     *
+     * Uses optimistic insert strategy to eliminate the TOCTOU race condition:
+     * - Random codes: retry up to 5x on DataIntegrityViolationException.
+     * - Custom alias: one attempt; DB constraint violation → clean 409.
      */
     public ShortUrlDTOResponse createShortUrl(ShortUrlDTORequest shortUrlDTORequest) {
-        String code;
-        do {
-            code = urlUtils.generate();
-        } while (shortUrlRepository.existsByShortCode(code));
-
-        // Get current authenticated user
         User currentUser = getCurrentUser();
 
-        ShortUrl shortUrl = ShortUrl.builder()
-                .originalUrl(shortUrlDTORequest.getOriginalUrl())
-                .shortCode(code)
-                .user(currentUser) // Associate with user
-                .build();
-
-        ShortUrl saved = shortUrlRepository.save(shortUrl);
-
-        // Warm the cache immediately (proactive caching)
-        redisService.cacheUrl(saved.getShortCode(), saved.getOriginalUrl());
-
-        return maptoResponse(saved);
+        if (shortUrlDTORequest.getCustomAlias() != null && !shortUrlDTORequest.getCustomAlias().isBlank()) {
+            // ── Custom alias path ──────────────────────────────────────────────
+            String code = shortUrlDTORequest.getCustomAlias().trim().toLowerCase();
+            ShortUrl entity = ShortUrl.builder()
+                    .originalUrl(shortUrlDTORequest.getOriginalUrl())
+                    .shortCode(code)
+                    .user(currentUser)
+                    .build();
+            try {
+                ShortUrl saved = shortUrlRepository.save(entity);
+                redisService.cacheUrl(saved.getShortCode(), saved.getOriginalUrl());
+                return maptoResponse(saved);
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                throw new AliasAlreadyTakenException("Alias '" + code + "' is already taken. Please choose another.");
+            }
+        } else {
+            // ── Random code path ───────────────────────────────────────────────
+            int maxAttempts = 5;
+            for (int attempt = 0; attempt < maxAttempts; attempt++) {
+                String code = urlUtils.generate();
+                ShortUrl entity = ShortUrl.builder()
+                        .originalUrl(shortUrlDTORequest.getOriginalUrl())
+                        .shortCode(code)
+                        .user(currentUser)
+                        .build();
+                try {
+                    ShortUrl saved = shortUrlRepository.save(entity);
+                    redisService.cacheUrl(saved.getShortCode(), saved.getOriginalUrl());
+                    return maptoResponse(saved);
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    log.warn("Short code collision on attempt {}/{}: '{}'", attempt + 1, maxAttempts, code);
+                    if (attempt == maxAttempts - 1) {
+                        throw new RuntimeException("Could not generate a unique short code. Please try again.");
+                    }
+                }
+            }
+            throw new RuntimeException("Unexpected error during URL creation.");
+        }
     }
 
     /**
      * Get all URLs for current authenticated user.
+     * Uses a single bulk-count query to avoid N+1 per URL.
      */
     public List<ShortUrlDTOResponse> getAllShortUrls() {
         User currentUser = getCurrentUser();
-        List<ShortUrl> urllist = shortUrlRepository.findAll();
+        List<ShortUrl> urls = shortUrlRepository.findByUserOrderByCreatedAtDesc(currentUser);
+        if (urls.isEmpty()) return List.of();
 
-        // Filter to only show current user's URLs
-        return urllist.stream()
-                .filter(url -> url.getUser() != null && url.getUser().getId().equals(currentUser.getId()))
-                .map(this::maptoResponse)
+        // Single query: counts for all URLs at once
+        Map<String, Long> clickCounts = new HashMap<>();
+        shortUrlRepository.countClicksForUrls(urls)
+                .forEach(row -> clickCounts.put((String) row[0], (Long) row[1]));
+
+        return urls.stream()
+                .map(u -> new ShortUrlDTOResponse(
+                        u.getId(),
+                        u.getOriginalUrl(),
+                        u.getShortCode(),
+                        clickCounts.getOrDefault(u.getShortCode(), 0L),
+                        u.getCreatedAt(),
+                        u.getExpiresAt()))
                 .toList();
     }
 
@@ -121,11 +161,12 @@ public class UrlService {
     }
 
     private ShortUrlDTOResponse maptoResponse(ShortUrl saved) {
+        long clickCount = shortUrlRepository.countClicksByShortCode(saved.getShortCode());
         return new ShortUrlDTOResponse(
                 saved.getId(),
                 saved.getOriginalUrl(),
                 saved.getShortCode(),
-                0L, // TODO: Calculate from ClickEvent count
+                clickCount,
                 saved.getCreatedAt(),
                 saved.getExpiresAt());
     }

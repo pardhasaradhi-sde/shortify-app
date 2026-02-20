@@ -17,7 +17,8 @@ public class RateLimitConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(rateLimitInterceptor)
-                .addPathPatterns("/api/urls/**") // Authenticated API endpoints
+                .addPathPatterns("/api/urls")    // URL creation (POST /api/urls)
+                .addPathPatterns("/api/urls/**") // All other /api/urls/* endpoints
                 .addPathPatterns("/{shortCode}"); // Public redirect endpoint
     }
 }

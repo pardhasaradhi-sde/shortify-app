@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        // 1. Extract JWT token from Authorization header
+        // 1. Extract JWT token from Authorization header.
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -48,8 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        jwt = authHeader.substring(7);
 
-        jwt = authHeader.substring(7); // Remove "Bearer " prefix
         userEmail = jwtUtil.extractUsername(jwt);
 
         // 2. If token contains username and user is not already authenticated

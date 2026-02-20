@@ -31,9 +31,9 @@ The system is composed of a **Spring Boot backend** exposing RESTful APIs and a 
 
 - **Layered Backend Design**  
   Clear separation of concerns using:
-  - Controller layer for request handling  
-  - Service layer for business logic  
-  - Repository layer for database access  
+  - Controller layer for request handling
+  - Service layer for business logic
+  - Repository layer for database access
 
 - **DTO-Based Communication**  
   Data Transfer Objects are used to prevent direct exposure of database entities.
@@ -88,6 +88,7 @@ url-shortener/
 └── .gitignore
 
 ```
+
 ## Backend Implementation Details
 
 - Controllers delegate all business logic to services, keeping request handlers lightweight.
@@ -100,12 +101,12 @@ url-shortener/
 
 ## REST API Endpoints
 
-| Method | Endpoint           | Description                    |
-|-------:|--------------------|--------------------------------|
-| POST   | `/api/urls`        | Create a shortened URL         |
-| GET    | `/api/urls`        | Retrieve all shortened URLs    |
-| GET    | `/{shortCode}`     | Redirect to original URL       |
-| DELETE | `/api/urls/{id}`   | Delete a shortened URL         |
+| Method | Endpoint         | Description                 |
+| -----: | ---------------- | --------------------------- |
+|   POST | `/api/urls`      | Create a shortened URL      |
+|    GET | `/api/urls`      | Retrieve all shortened URLs |
+|    GET | `/{shortCode}`   | Redirect to original URL    |
+| DELETE | `/api/urls/{id}` | Delete a shortened URL      |
 
 ---
 
@@ -114,7 +115,6 @@ url-shortener/
 When accessing a shortened URL:
 
 http://localhost:8080/AbC123xy
-
 
 - Extracts the short code from the request
 - Finds the original URL in the database
@@ -140,6 +140,7 @@ cd backend
 mvn spring-boot:run
 Backend runs at: http://localhost:8080
 ```
+
 ### Start Frontend
 
 ```bash
@@ -148,4 +149,3 @@ npm install
 npm run dev
 Frontend runs at: http://localhost:5173
 ```
-

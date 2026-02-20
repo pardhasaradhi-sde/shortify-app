@@ -46,7 +46,7 @@ public class AuthService {
                                 .id(UUID.randomUUID())
                                 .email(request.getEmail())
                                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                                .role(request.getRole() != null ? request.getRole() : "USER")
+                                .role("USER")
                                 .build();
 
                 userRepository.save(user);

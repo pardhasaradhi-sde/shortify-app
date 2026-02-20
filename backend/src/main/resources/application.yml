@@ -3,15 +3,16 @@ spring:
     name: Url_Shortener
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/url_shortener
-    username: postgres
-    password: pardhasaradhi
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/url_shortener}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
+    open-in-view: false
     properties:
       hibernate:
         format-sql: true
@@ -29,8 +30,9 @@ spring:
     type: redis
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
       timeout: 2000ms
 
 # Cache Settings
@@ -41,6 +43,11 @@ cache:
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production-minimum-32-characters-required}
   expiration: 86400000
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
 
 # Rate Limiting Configuration
 rate-limit:

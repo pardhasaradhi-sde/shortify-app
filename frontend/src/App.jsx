@@ -1,18 +1,23 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
+import GuestRoute from './components/GuestRoute';
+import LandingPage from './pages/landing';
+import LoginPage from './pages/login';
+import RegisterPage from './pages/register';
+import DashboardPage from './pages/dashboard';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/* Public — but redirect to dashboard if already logged in */}
+          <Route path="/" element={<GuestRoute><LandingPage /></GuestRoute>} />
+          <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+
+          {/* Protected — redirect to login if not authenticated */}
           <Route
             path="/dashboard"
             element={
@@ -21,6 +26,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

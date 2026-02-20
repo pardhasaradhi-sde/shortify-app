@@ -66,8 +66,8 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             action = "url_creation";
             maxRequests = urlCreationMaxRequests;
             window = Duration.ofSeconds(urlCreationWindowSeconds);
-        } else if (path.matches("/[a-zA-Z0-9]+")) {
-            // Redirect - rate limit by IP
+        } else if (path.matches("/[a-zA-Z0-9][a-zA-Z0-9-]*")) {
+            // Redirect - rate limit by IP (covers both random codes and hyphenated custom aliases)
             identifier = getClientIp(request);
             action = "redirect";
             maxRequests = redirectMaxRequests;
