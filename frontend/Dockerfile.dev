@@ -1,0 +1,16 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Install dependencies first (cached layer — only re-runs if package.json changes)
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the source
+# The docker-compose volumes will overlay src/, public/, index.html at runtime
+# so edits on your host are reflected instantly without rebuilding.
+COPY . .
+
+EXPOSE 5173
+
+# --host 0.0.0.0 is required so the Vite dev server is reachable outside the container
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -1,0 +1,89 @@
+# Full local dev stack — runs everything with one command:
+#   docker compose up --build
+#
+# Services:
+#   redis     → localhost:6379
+#   backend   → http://localhost:8080  (connects to YOUR local Postgres)
+#   frontend  → http://localhost:5173  (Vite with hot reload)
+#
+# Postgres is NOT containerised — the backend talks to your existing
+# local Postgres via host.docker.internal (Docker Desktop's magic hostname).
+
+services:
+
+  # ── Redis ─────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: shortify-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # ── Spring Boot Backend ───────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shortify-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Use the default dev profile (application.yml) locally, not application-prod.yml
+      SPRING_PROFILES_ACTIVE: default
+
+      # Override the prod ENTRYPOINT port default (which is 10000 on Render)
+      PORT: 8080
+
+      # Your existing local Postgres — host.docker.internal resolves to your Windows host
+      DB_URL: jdbc:postgresql://host.docker.internal:5432/url_shortener
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # Local redis — no SSL, no password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_SSL: "false"
+
+      # JWT secret — loaded from root .env file
+      JWT_SECRET: ${JWT_SECRET}
+
+      # URLs
+      APP_BASE_URL: http://localhost:8080
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  # ── React / Vite Frontend ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: shortify-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080
+      # Required for hot reload to work inside Docker on Windows/Mac
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      # Mount source dirs so Vite picks up edits without rebuilding the image
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+    depends_on:
+      - backend
+
+volumes:
+  redis-data:

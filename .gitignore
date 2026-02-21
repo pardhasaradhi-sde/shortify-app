@@ -14,12 +14,13 @@ frontend/.env.*
 ############################
 # Docker & deployment
 ############################
-docker-compose*.yml
 frontend/Dockerfile
 frontend/nginx/
-.env.production.example
 CONTAINERIZATION_AND_CLOUD_DEPLOYMENT_GUIDE.md
 **/.dockerignore
+
+# Root .env (contains local secrets)
+.env
 
 ############################
 # Spring Boot production config
@@ -47,6 +48,8 @@ backend/.classpath
 backend/.project
 backend/.factorypath
 backend/.springBeans
+BACKEND_DOCS.md
+FRONTEND_DOCS.md
 backend/build/
 backend/.gradle/
 backend/nbproject/

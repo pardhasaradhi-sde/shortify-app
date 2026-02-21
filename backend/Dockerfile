@@ -13,19 +13,21 @@ COPY src src
 RUN mvn -q -DskipTests clean package
 
 # ===== Runtime stage =====
-FROM eclipse-temurin:21-jre
+# Alpine variant is ~200MB vs ~350MB for the Debian JRE
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Install curl (used by the docker-compose healthcheck)
-# Create a non-root system user to run the application
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system app \
-    && useradd --system --gid app --home /app app
+# Alpine uses addgroup/adduser instead of groupadd/useradd
+RUN addgroup --system app && adduser --system --ingroup app app
 
 COPY --from=build --chown=app:app /app/target/*.jar app.jar
 
 USER app
 EXPOSE 8080
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=60.0", "-XX:+UseSerialGC", "-XX:MaxMetaspaceSize=128m", "-Xss256k", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+
+# Default to prod profile — override with SPRING_PROFILES_ACTIVE env var.
+# docker-compose sets this to the default (dev) profile for local use.
+# Render leaves it unset so this default kicks in for production.
+ENV SPRING_PROFILES_ACTIVE=prod
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=60.0", "-XX:+UseSerialGC", "-XX:MaxMetaspaceSize=128m", "-Xss256k", "-jar", "app.jar"]
