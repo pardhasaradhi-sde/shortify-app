@@ -28,15 +28,4 @@ COPY --from=build --chown=app:app /app/target/*.jar app.jar
 
 USER app
 EXPOSE 8080
-ENTRYPOINT [
-  "java",
-  "-Djava.security.egd=file:/dev/./urandom",
-  "-XX:+UseContainerSupport",
-  "-XX:MaxRAMPercentage=60.0",
-  "-XX:+UseSerialGC",
-  "-XX:MaxMetaspaceSize=128m",
-  "-Xss256k",
-  "-Dspring.profiles.active=prod",
-  "-jar",
-  "app.jar"
-]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=60.0", "-XX:+UseSerialGC", "-XX:MaxMetaspaceSize=128m", "-Xss256k", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
