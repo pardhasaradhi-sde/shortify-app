@@ -39,6 +39,13 @@ spring:
         enabled: ${REDIS_SSL:true}
       timeout: 2000ms
 
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 4
+        queue-capacity: 50
+
 cache:
   url:
     ttl: 86400
@@ -66,16 +73,8 @@ rate-limit:
 server:
   tomcat:
     threads:
-      max: 20          # default 200 — each thread uses ~256-512KB stack
+      max: 20
       min-spare: 4
-
-spring:
-  task:
-    execution:
-      pool:
-        core-size: 2   # async thread pool for click event recording
-        max-size: 4
-        queue-capacity: 50
 
 logging:
   level:
