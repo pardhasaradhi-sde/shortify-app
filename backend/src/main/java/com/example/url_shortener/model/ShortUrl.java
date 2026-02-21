@@ -23,7 +23,7 @@ public class ShortUrl {
         @GeneratedValue(strategy = GenerationType.UUID)
         private UUID id;
 
-        @Column(name = "short_code", nullable = false, unique = true, length = 10)
+        @Column(name = "short_code", nullable = false, unique = true, length = 20)
         private String shortCode;
 
         @Column(name = "original_url", nullable = false, columnDefinition = "TEXT")

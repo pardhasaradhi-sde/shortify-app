@@ -61,5 +61,4 @@ export const stats = [
   { label: 'Links created', value: 100, suffix: '+' },
   { label: 'Avg. redirect time', value: 8, suffix: 'ms' },
   { label: 'Uptime', value: 99.9, suffix: '%' },
-  { label: 'Countries tracking', value: 180, suffix: '+' },
 ];

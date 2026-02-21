@@ -39,9 +39,6 @@ public class ClickEvent {
     @Column(columnDefinition = "TEXT")
     private String referrer;
 
-    @Column(name = "country_code", length = 2)
-    private String countryCode;
-
     @Column(length = 50)
     private String browser;
 

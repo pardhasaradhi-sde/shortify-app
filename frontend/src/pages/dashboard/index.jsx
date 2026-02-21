@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Link2, BarChart2, Plus, LogOut,
   Zap, TrendingUp, MousePointer,
-  RefreshCw, ChevronRight,
+  RefreshCw, ChevronRight, ExternalLink, Calendar,
 } from 'lucide-react';
+import { API_BASE, BASE_DOMAIN } from './constants';
 import { useAuth } from '../../context/AuthContext';
 import { urlApi } from '../../services/api';
 import { toast, ToastContainer } from '../../components/ui/Toast';
@@ -331,34 +332,99 @@ export default function DashboardPage() {
               {/* Top links table */}
               {urls.length > 0 && (
                 <div className="rounded-2xl border border-neutral-200 bg-white overflow-hidden">
-                  <div className="px-5 py-4 border-b border-neutral-200">
-                    <p className="text-sm font-grotesk font-medium text-neutral-900">Top links by clicks</p>
+                  <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-grotesk font-medium text-neutral-900">Top links by clicks</p>
+                      <p className="text-xs text-neutral-400 font-inter mt-0.5">Sorted by total click volume</p>
+                    </div>
+                    <span className="text-xs font-mono text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-lg">
+                      top {Math.min(8, urls.length)}
+                    </span>
                   </div>
-                  <div className="divide-y divide-neutral-200">
+                  <div className="divide-y divide-neutral-100">
                     {[...urls]
                       .sort((a, b) => (b.clickCount ?? 0) - (a.clickCount ?? 0))
                       .slice(0, 8)
-                      .map((url) => {
+                      .map((url, idx) => {
                         const pct = totalClicks > 0 ? ((url.clickCount ?? 0) / totalClicks) * 100 : 0;
+                        const favicon = (() => {
+                          try { return `https://icons.duckduckgo.com/ip3/${new URL(url.originalUrl).hostname}.ico`; }
+                          catch { return null; }
+                        })();
+                        const createdDate = url.createdAt
+                          ? new Date(url.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : null;
+                        const rankColors = ['text-orange-500', 'text-neutral-500', 'text-amber-600'];
+                        const rankBg = ['bg-orange-50 border-orange-200', 'bg-neutral-50 border-neutral-200', 'bg-amber-50 border-amber-200'];
+
                         return (
-                          <div key={url.uuid} className="flex items-center gap-4 px-5 py-3">
-                            <span className="font-mono text-sm text-neutral-700 truncate flex-1">
-                              /{url.shortUrl}
-                            </span>
-                            <div className="w-32 bg-neutral-100 rounded-full h-1.5 hidden sm:block">
-                              <div
-                                className="h-full rounded-full bg-orange-500"
-                                style={{ width: `${pct}%` }}
-                              />
+                          <div key={url.uuid} className="flex items-center gap-4 px-5 py-3.5 hover:bg-neutral-50 transition-colors group">
+                            {/* Rank */}
+                            <div className={`w-6 h-6 rounded-lg border flex items-center justify-center flex-shrink-0 text-[10px] font-mono font-bold
+                              ${idx < 3 ? rankBg[idx] + ' ' + rankColors[idx] : 'bg-neutral-50 border-neutral-200 text-neutral-400'}`}>
+                              {idx + 1}
                             </div>
-                            <span className="text-xs text-neutral-500 font-mono w-12 text-right">
-                              {url.clickCount ?? 0}
-                            </span>
+
+                            {/* Favicon + URLs */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                {favicon && (
+                                  <img src={favicon} alt="" className="w-3.5 h-3.5 rounded-sm flex-shrink-0 object-contain"
+                                    onError={(e) => e.currentTarget.style.display = 'none'} />
+                                )}
+                                <a
+                                  href={`${API_BASE}/${url.shortUrl}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-xs text-neutral-900 hover:text-orange-600 transition-colors truncate"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {BASE_DOMAIN}/{url.shortUrl}
+                                </a>
+                                <ExternalLink className="w-2.5 h-2.5 text-neutral-300 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                              <p className="text-xs text-neutral-400 font-inter truncate leading-tight">
+                                {url.originalUrl}
+                              </p>
+                            </div>
+
+                            {/* Progress + stats */}
+                            <div className="hidden sm:flex flex-col items-end gap-1.5 flex-shrink-0 w-36">
+                              <div className="w-full bg-neutral-100 rounded-full h-1 overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.8, delay: idx * 0.05 }}
+                                  className="h-full rounded-full bg-orange-500"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2 text-[10px] font-mono text-neutral-400">
+                                {createdDate && (
+                                  <span className="flex items-center gap-0.5">
+                                    <Calendar className="w-2.5 h-2.5" />{createdDate}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Click count */}
+                            <div className="flex flex-col items-end flex-shrink-0 w-16">
+                              <span className="text-sm font-grotesk font-semibold text-neutral-900">
+                                {(url.clickCount ?? 0).toLocaleString()}
+                              </span>
+                              <span className="text-[10px] font-mono text-neutral-400">
+                                {pct.toFixed(1)}%
+                              </span>
+                            </div>
+
+                            {/* Analytics button */}
                             <button
                               onClick={() => setAnalyticsFor(url.shortUrl)}
-                              className="text-neutral-500 hover:text-neutral-900 transition-colors"
+                              className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400
+                                hover:text-neutral-900 hover:bg-neutral-100 transition-all flex-shrink-0"
+                              title="View analytics"
                             >
-                              <ChevronRight className="w-4 h-4" />
+                              <ChevronRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         );

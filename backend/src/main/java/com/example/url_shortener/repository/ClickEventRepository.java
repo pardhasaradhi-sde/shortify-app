@@ -20,10 +20,6 @@ public interface ClickEventRepository extends JpaRepository<ClickEvent, UUID> {
     /** All click events for analytics aggregation. */
     List<ClickEvent> findByShortUrlOrderByClickedAtDesc(ShortUrl shortUrl);
 
-    /** Count clicks per country for a given short URL. */
-    @Query("SELECT c.countryCode AS label, COUNT(c) AS count FROM ClickEvent c WHERE c.shortUrl = :shortUrl GROUP BY c.countryCode ORDER BY COUNT(c) DESC")
-    List<Map<String, Object>> countByCountry(ShortUrl shortUrl);
-
     /** Count clicks per browser for a given short URL. */
     @Query("SELECT c.browser AS label, COUNT(c) AS count FROM ClickEvent c WHERE c.shortUrl = :shortUrl GROUP BY c.browser ORDER BY COUNT(c) DESC")
     List<Map<String, Object>> countByBrowser(ShortUrl shortUrl);

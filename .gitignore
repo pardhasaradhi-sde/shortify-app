@@ -12,10 +12,9 @@ frontend/.env.local
 frontend/.env.*
 
 ############################
-# Docker & deployment (temporary — remove when ready to deploy)
+# Docker & deployment
 ############################
 docker-compose*.yml
-backend/Dockerfile
 frontend/Dockerfile
 frontend/nginx/
 .env.production.example
@@ -23,10 +22,8 @@ CONTAINERIZATION_AND_CLOUD_DEPLOYMENT_GUIDE.md
 **/.dockerignore
 
 ############################
-# Spring Boot production config (temporary)
+# Spring Boot production config
 ############################
-backend/src/main/resources/application-prod.yml
-backend/src/main/resources/application-prod.yml.template
 
 ############################
 # IDEs / Editors

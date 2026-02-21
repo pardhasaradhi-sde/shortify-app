@@ -31,7 +31,6 @@ public class AnalyticsService {
         long totalClicks = clickEventRepository.countByShortUrl(shortUrl);
         long uniqueVisitors = clickEventRepository.countUniqueVisitors(shortUrl);
 
-        List<Map<String, Object>> byCountry = clickEventRepository.countByCountry(shortUrl);
         List<Map<String, Object>> byBrowser = clickEventRepository.countByBrowser(shortUrl);
         List<Map<String, Object>> byOs = clickEventRepository.countByOs(shortUrl);
 
@@ -50,7 +49,6 @@ public class AnalyticsService {
                 .originalUrl(shortUrl.getOriginalUrl())
                 .totalClicks(totalClicks)
                 .uniqueVisitors(uniqueVisitors)
-                .clicksByCountry(byCountry)
                 .clicksByBrowser(byBrowser)
                 .clicksByOs(byOs)
                 .clicksOverTime(clicksOverTime)

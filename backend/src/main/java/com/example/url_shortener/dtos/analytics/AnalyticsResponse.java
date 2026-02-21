@@ -20,9 +20,6 @@ public class AnalyticsResponse {
     private long totalClicks;
     private long uniqueVisitors;
 
-    /** e.g. [ { "label": "IN", "count": 420 }, { "label": "US", "count": 120 } ] */
-    private List<Map<String, Object>> clicksByCountry;
-
     /** e.g. [ { "label": "Chrome", "count": 300 } ] */
     private List<Map<String, Object>> clicksByBrowser;
 

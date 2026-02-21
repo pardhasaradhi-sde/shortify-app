@@ -3,6 +3,7 @@ package com.example.url_shortener.controller;
 import com.example.url_shortener.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,6 +23,7 @@ public class CacheController {
      * Get cache statistics.
      * Shows how many URLs are currently cached.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
     public ResponseEntity<Map<String, String>> getCacheStats() {
         String stats = redisService.getCacheStats();
@@ -35,6 +37,7 @@ public class CacheController {
      * Use with caution - this will cause cache misses until URLs are accessed
      * again.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/clear")
     public ResponseEntity<Map<String, String>> clearCache() {
         redisService.clearAllCache();
@@ -47,6 +50,7 @@ public class CacheController {
      * Invalidate a specific URL from cache.
      * Useful when a URL is updated or needs to be refreshed.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{shortCode}")
     public ResponseEntity<Map<String, String>> invalidateUrl(@PathVariable String shortCode) {
         redisService.invalidateUrl(shortCode);

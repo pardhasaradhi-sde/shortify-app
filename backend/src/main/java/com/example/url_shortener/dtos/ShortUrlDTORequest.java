@@ -1,6 +1,7 @@
 package com.example.url_shortener.dtos;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,5 +22,6 @@ public class ShortUrlDTORequest {
      * Optional: user-specified alias (e.g. "my-portfolio"). Null = auto-generate.
      */
     @Size(max = 20, message = "Custom alias must be 20 characters or fewer")
+    @Pattern(regexp = "^[a-z0-9-]+$", message = "Custom alias can only contain lowercase letters, numbers, and hyphens")
     private String customAlias;
 }

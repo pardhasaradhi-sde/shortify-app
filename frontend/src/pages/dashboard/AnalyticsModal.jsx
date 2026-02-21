@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { MousePointer, Users, Globe, X } from 'lucide-react';
+import { MousePointer, Users, X } from 'lucide-react';
 import { urlApi } from '../../services/api';
 import { toast } from '../../components/ui/Toast';
 import { COLORS } from './constants';
@@ -62,11 +62,10 @@ export default function AnalyticsModal({ shortCode, onClose }) {
           ) : (
             <div className="space-y-5">
               {/* Top stats */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: 'Total Clicks', value: data.totalClicks, icon: <MousePointer className="w-4 h-4 text-neutral-900" /> },
                   { label: 'Unique Visitors', value: data.uniqueVisitors, icon: <Users className="w-4 h-4 text-neutral-700" /> },
-                  { label: 'Countries', value: (data.clicksByCountry || []).filter(c => c.label && c.label !== 'null').length || '—', icon: <Globe className="w-4 h-4 text-orange-600" /> },
                 ].map((s) => (
                   <div key={s.label} className="rounded-2xl border border-neutral-200 bg-[#fafaf9] p-4 text-center">
                     <div className="flex justify-center mb-2">{s.icon}</div>
@@ -129,37 +128,7 @@ export default function AnalyticsModal({ shortCode, onClose }) {
                 )}
               </div>
 
-              {/* Countries — only show if there's real country data */}
-              {(() => {
-                const validCountries = (data.clicksByCountry || []).filter(
-                  (c) => c.label && c.label !== 'null' && c.label !== 'unknown'
-                );
-                if (validCountries.length === 0) return null;
-                return (
-                  <div className="rounded-2xl border border-neutral-200 bg-[#fafaf9] p-4">
-                    <p className="text-xs text-neutral-500 font-inter uppercase tracking-wider mb-3">Top Countries</p>
-                    <div className="space-y-2.5">
-                      {validCountries.slice(0, 8).map((c, i) => {
-                        const pct = data.totalClicks > 0 ? (c.count / data.totalClicks) * 100 : 0;
-                        return (
-                          <div key={i} className="flex items-center gap-3">
-                            <span className="text-xs font-mono text-neutral-500 w-8">{c.label}</span>
-                            <div className="flex-1 bg-neutral-200 rounded-full h-1.5 overflow-hidden">
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.8, delay: i * 0.08 }}
-                                className="h-full rounded-full bg-gradient-to-r from-neutral-900 to-orange-500"
-                              />
-                            </div>
-                            <span className="text-xs text-neutral-500 w-6 text-right">{c.count}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
+
             </div>
           )}
         </div>

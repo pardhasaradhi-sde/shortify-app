@@ -1,55 +1,53 @@
 # Shortify — Full-Stack URL Shortener
 
-A production-grade URL shortener built with **Spring Boot 3.4** and **React 19**. Shortify turns long URLs into fast, shareable short links and gives you a real-time analytics dashboard to track every click — broken down by country, browser, OS, and daily trend.
+A production-grade URL shortener built with **Spring Boot 4** and **React 19**. Shortify turns long URLs into fast, shareable short links and gives you a real-time analytics dashboard to track every click — broken down by country, browser, OS, and daily trend.
 
 ---
 
 ## ✨ Features
 
-| Feature                          | Details                                                                                          |
-| -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **URL Shortening**               | Convert any URL into an 8-character short code                                                   |
-| **Custom Aliases**               | Optionally set your own slug (e.g. `/my-brand`)                                                  |
-| **Sub-10ms Redirects**           | Redis cache layer sits in front of every redirect                                                |
-| **JWT Authentication**           | Stateless auth — register, login, and all URLs are private by default                            |
-| **Click Analytics**              | Total clicks, unique visitors, breakdown by country / browser / OS, 30-day time series           |
-| **Async Click Recording**        | Redirect returns immediately; analytics are written on a background thread — zero latency impact |
-| **GeoIP Lookup**                 | Country code resolved per click via ip-api.com (no API key required)                             |
-| **QR Code Generation**           | On-demand PNG QR codes for any short link, downloadable from the dashboard                       |
-| **Sliding-Window Rate Limiting** | Per-user limits on URL creation and API calls; per-IP limits on redirects — enforced via Redis   |
-| **Flyway Migrations**            | Schema versioned and migrated automatically on startup                                           |
-| **Animated Landing Page**        | Particle background, animated counters, feature cards, step-by-step guide                        |
-| **Responsive Dashboard**         | Create links, view all URLs, copy, delete, open analytics modal, download QR                     |
+| Feature | Details |
+|---|---|
+| **URL Shortening** | Convert any URL into an 8-character short code |
+| **Custom Aliases** | Optionally set your own slug (e.g. `/my-brand`) |
+| **Sub-10ms Redirects** | Redis cache layer sits in front of every redirect |
+| **JWT Authentication** | Stateless auth — register, login, and all URLs are private by default |
+| **Click Analytics** | Total clicks, unique visitors, breakdown by country / browser / OS, 30-day time series |
+| **Async Click Recording** | Redirect returns immediately; analytics are written on a background thread — zero latency impact |
+| **GeoIP Lookup** | Country code resolved per click via ip-api.com (no API key required) |
+| **QR Code Generation** | On-demand PNG QR codes for any short link, downloadable from the dashboard |
+| **Sliding-Window Rate Limiting** | Per-user limits on URL creation and API calls; per-IP limits on redirects — enforced via Redis |
+| **Flyway Migrations** | Schema versioned and migrated automatically on startup |
+| **Animated Landing Page** | Particle background, animated counters, feature cards, step-by-step guide |
+| **Responsive Dashboard** | Create links, view all URLs, copy, delete, open analytics modal, download QR |
 
 ---
 
 ## 🛠 Tech Stack
 
 ### Backend
-
-| Layer                    | Technology                                |
-| ------------------------ | ----------------------------------------- |
-| Runtime                  | Java 21, Spring Boot 3.4                  |
-| Web                      | Spring MVC (REST)                         |
-| Security                 | Spring Security + JWT (JJWT 0.12), BCrypt |
-| Database                 | PostgreSQL 16, Spring Data JPA, Hibernate |
-| Migrations               | Flyway                                    |
-| Cache / Rate-limit store | Redis 7 (Spring Data Redis)               |
-| QR Codes                 | ZXing 3.5                                 |
-| Build                    | Maven                                     |
-| Utilities                | Lombok                                    |
+| Layer | Technology |
+|---|---|
+| Runtime | Java 21, Spring Boot 4 |
+| Web | Spring MVC (REST) |
+| Security | Spring Security + JWT (JJWT 0.12), BCrypt |
+| Database | PostgreSQL 16, Spring Data JPA, Hibernate |
+| Migrations | Flyway |
+| Cache / Rate-limit store | Redis 7 (Spring Data Redis) |
+| QR Codes | ZXing 3.5 |
+| Build | Maven |
+| Utilities | Lombok |
 
 ### Frontend
-
-| Layer      | Technology                 |
-| ---------- | -------------------------- |
-| Framework  | React 19 + Vite 7          |
-| Routing    | React Router v7            |
-| Styling    | Tailwind CSS v3            |
-| Animations | Framer Motion              |
-| Charts     | Recharts                   |
-| Icons      | Lucide React               |
-| HTTP       | Fetch API (custom wrapper) |
+| Layer | Technology |
+|---|---|
+| Framework | React 19 + Vite 7 |
+| Routing | React Router v7 |
+| Styling | Tailwind CSS v3 |
+| Animations | Framer Motion |
+| Charts | Recharts |
+| Icons | Lucide React |
+| HTTP | Fetch API (custom wrapper) |
 
 ---
 
@@ -102,34 +100,34 @@ A production-grade URL shortener built with **Spring Boot 3.4** and **React 19**
 
 ### Auth
 
-| Method | Endpoint         | Auth   | Description             |
-| ------ | ---------------- | ------ | ----------------------- |
-| `POST` | `/auth/register` | Public | Register a new account  |
-| `POST` | `/auth/login`    | Public | Login and receive a JWT |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/auth/register` | Public | Register a new account |
+| `POST` | `/auth/login` | Public | Login and receive a JWT |
 
 ### URLs
 
-| Method   | Endpoint         | Auth   | Description                                 |
-| -------- | ---------------- | ------ | ------------------------------------------- |
-| `POST`   | `/api/urls`      | ✅     | Create a short URL (optional `customAlias`) |
-| `GET`    | `/api/urls`      | ✅     | List all URLs for the current user          |
-| `DELETE` | `/api/urls/{id}` | ✅     | Delete a URL (owner only)                   |
-| `GET`    | `/{shortCode}`   | Public | Redirect to original URL (302)              |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/urls` | ✅ | Create a short URL (optional `customAlias`) |
+| `GET` | `/api/urls` | ✅ | List all URLs for the current user |
+| `DELETE` | `/api/urls/{id}` | ✅ | Delete a URL (owner only) |
+| `GET` | `/{shortCode}` | Public | Redirect to original URL (302) |
 
 ### Analytics & QR
 
-| Method | Endpoint                          | Auth   | Description               |
-| ------ | --------------------------------- | ------ | ------------------------- |
-| `GET`  | `/api/urls/{shortCode}/analytics` | ✅     | Full analytics report     |
-| `GET`  | `/api/urls/{shortCode}/qr`        | Public | PNG QR code (`?size=300`) |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/urls/{shortCode}/analytics` | ✅ | Full analytics report |
+| `GET` | `/api/urls/{shortCode}/qr` | Public | PNG QR code (`?size=300`) |
 
-### Cache Admin _(ADMIN role)_
+### Cache Admin *(ADMIN role)*
 
-| Method   | Endpoint                   | Description           |
-| -------- | -------------------------- | --------------------- |
-| `GET`    | `/admin/cache/stats`       | Cache hit/miss stats  |
-| `DELETE` | `/admin/cache/clear`       | Flush all cached URLs |
-| `DELETE` | `/admin/cache/{shortCode}` | Invalidate one entry  |
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/admin/cache/stats` | Cache hit/miss stats |
+| `DELETE` | `/admin/cache/clear` | Flush all cached URLs |
+| `DELETE` | `/admin/cache/{shortCode}` | Invalidate one entry |
 
 #### Analytics Response Shape
 
@@ -139,13 +137,10 @@ A production-grade URL shortener built with **Spring Boot 3.4** and **React 19**
   "originalUrl": "https://example.com/very/long/path",
   "totalClicks": 1420,
   "uniqueVisitors": 843,
-  "clicksByCountry": [
-    { "label": "IN", "count": 620 },
-    { "label": "US", "count": 310 }
-  ],
+  "clicksByCountry": [{ "label": "IN", "count": 620 }, { "label": "US", "count": 310 }],
   "clicksByBrowser": [{ "label": "Chrome", "count": 900 }],
-  "clicksByOs": [{ "label": "Windows", "count": 750 }],
-  "clicksOverTime": [{ "date": "2026-02-01", "count": 42 }]
+  "clicksByOs":      [{ "label": "Windows", "count": 750 }],
+  "clicksOverTime":  [{ "date": "2026-02-01", "count": 42 }]
 }
 ```
 
@@ -191,7 +186,6 @@ urlshortener/
 ## 🚀 Running Locally
 
 ### Prerequisites
-
 - Java 21+
 - Maven 3.9+
 - Node.js 20+
