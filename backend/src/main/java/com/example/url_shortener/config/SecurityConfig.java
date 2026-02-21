@@ -76,7 +76,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/{shortCode}").permitAll()
-                    .requestMatchers("/admin/cache/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/cache/**").hasRole("ADMIN")
                         .requestMatchers("/api/urls/*/qr").permitAll() // QR images are public
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
@@ -111,7 +111,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
