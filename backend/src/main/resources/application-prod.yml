@@ -21,7 +21,6 @@ spring:
     properties:
       hibernate:
         format-sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
     enabled: true
@@ -71,6 +70,7 @@ rate-limit:
     window-seconds: ${RATE_LIMIT_API_WINDOW_SECONDS:3600}
 
 server:
+  port: ${PORT:10000}
   tomcat:
     threads:
       max: 20
