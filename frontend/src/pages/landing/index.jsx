@@ -41,8 +41,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 bg-white border border-neutral-200 px-4 py-2 rounded-full mb-8 text-sm font-inter text-neutral-700"
           >
-            <span className="w-2 h-2 rounded-full bg-orange-500" />
-            Redis-backed — sub-10ms redirects worldwide
+            
           </motion.div>
 
           <h1 className="text-6xl sm:text-7xl md:text-8xl font-display leading-[0.95] uppercase mb-6">
