@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/health").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/{shortCode}").permitAll()
                         .requestMatchers("/api/urls/*/qr").permitAll()
                         .requestMatchers("/admin/cache/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
