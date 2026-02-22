@@ -48,8 +48,7 @@ backend/.classpath
 backend/.project
 backend/.factorypath
 backend/.springBeans
-BACKEND_DOCS.md
-FRONTEND_DOCS.md
+docs/*
 backend/build/
 backend/.gradle/
 backend/nbproject/
