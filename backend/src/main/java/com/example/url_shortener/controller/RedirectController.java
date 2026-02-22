@@ -22,7 +22,7 @@ public class RedirectController {
     private final ShortUrlRepository shortUrlRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @GetMapping("/{shortUrl}")
+    @GetMapping("/{shortUrl:(?!health$|favicon\\.ico$).*}")
     public ResponseEntity<Void> redirect(@PathVariable String shortUrl, HttpServletRequest request) {
         // Step 1: Resolve URL (uses Redis cache — ~5ms)
         String originalUrl = urlService.resolveShortUrl(shortUrl);
