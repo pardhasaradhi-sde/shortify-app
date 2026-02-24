@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { Analytics } from '@vercel/analytics/react';
 import ProtectedRoute from './components/ProtectedRoute';
 import GuestRoute from './components/GuestRoute';
 import LandingPage from './pages/landing';
@@ -11,6 +12,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <Analytics />
         <Routes>
           {/* Public — but redirect to dashboard if already logged in */}
           <Route path="/" element={<GuestRoute><LandingPage /></GuestRoute>} />

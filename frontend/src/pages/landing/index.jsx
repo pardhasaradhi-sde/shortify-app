@@ -30,20 +30,12 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#f6f6f4] text-neutral-900 overflow-x-hidden">
       <Navbar />
-
+      <main>
       <section className="relative min-h-screen flex items-center justify-center pt-16">
         <div className="absolute inset-0 bg-gradient-to-b from-white via-[#f6f6f4] to-[#f1f1ef] pointer-events-none" />
 
         <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-white border border-neutral-200 px-4 py-2 rounded-full mb-8 text-sm font-inter text-neutral-700"
-          >
-            
-          </motion.div>
-
+          
           <h1 className="text-6xl sm:text-7xl md:text-8xl font-display leading-[0.95] uppercase mb-6">
             <SplitText text="Shorten." delay={0.1} />
             <span className="text-orange-500"><SplitText text="Track." delay={0.2} /></span>
@@ -88,7 +80,7 @@ export default function LandingPage() {
                 Continue
               </button>
             </div>
-            <p className="text-xs text-neutral-500 mt-2 text-left px-2">
+            <p className="text-xs text-neutral-600 mt-2 text-left px-2">
               We’ll validate your session first, then create your short link.
             </p>
           </motion.form>
@@ -104,7 +96,7 @@ export default function LandingPage() {
                 <div className="text-3xl font-grotesk font-bold text-neutral-900">
                   <AnimatedCounter target={s.value} suffix={s.suffix} />
                 </div>
-                <div className="text-neutral-500 text-sm font-inter mt-1">{s.label}</div>
+                <div className="text-neutral-600 text-sm font-inter mt-1">{s.label}</div>
               </div>
             ))}
           </motion.div>
@@ -214,20 +206,22 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      </main>
       <footer className="border-t border-neutral-200 py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src="/shortify.png" alt="Shortify logo" className="w-6 h-6 object-contain" />
             <span className="font-grotesk font-bold text-neutral-900">Shortify</span>
           </div>
-          <p className="text-neutral-500 font-inter text-sm">
+          <p className="text-neutral-600 font-inter text-sm">
             Built with Spring Boot 4 + Redis + React 19
           </p>
           <a
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="text-neutral-600 hover:text-neutral-900 transition-colors"
+            aria-label="GitHub Repository"
           >
             <Github className="w-5 h-5" />
           </a>

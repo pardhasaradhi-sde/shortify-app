@@ -59,6 +59,7 @@ export const steps = [
 
 export const stats = [
   { label: 'Links created', value: 100, suffix: '+' },
+  { label: 'Clicks tracked', value: 500, suffix: '+' },
   { label: 'Avg. redirect time', value: 8, suffix: 'ms' },
   { label: 'Uptime', value: 99.9, suffix: '%' },
 ];
